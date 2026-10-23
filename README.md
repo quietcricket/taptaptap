@@ -1,0 +1,70 @@
+# taptaptap
+
+[Play taptaptap](https://quietcricket.github.io/taptaptap/) · [Source and contributions](https://github.com/quietcricket/taptaptap)
+
+A little world for every key. A keyboard playground for children who enjoy pressing keys and watching things happen. No lessons, scores, accounts, or tracking.
+
+Built with TypeScript, Vite, PixiJS, Matter.js, and plain HTML/CSS controls. Fredoka is bundled locally through Fontsource; sound effects are synthesized with Web Audio. Nothing is sent to a server while playing.
+
+## Run locally
+
+Use Node.js 22.12+ (or a compatible newer release) and pnpm 11.10.0.
+
+```sh
+pnpm install
+pnpm dev
+```
+
+Open the local address printed by Vite. Press a key or choose **Let’s play**. Physical keyboards are the primary input; browser and OS shortcuts remain available.
+
+## Worlds
+
+- **Float:** letters drift upward with a gentle sway.
+- **Tumble:** letters fall, bounce, and collect in a pile. Rounded collision boxes approximate the glyphs.
+- **Train:** letters join a moving chain and follow their neighbours.
+- **Story:** any play key reveals the next character of a prepared passage, with automatic spaces, punctuation, and word wrapping. Twelve original three-paragraph stories flow one after another; pauses do not reset the passage. Add your own passage in parent settings; it stays in this browser.
+- **Typewriter:** actual typed characters form lines of text with a blinking cursor. Space inserts a space, Enter starts a new line, and Backspace removes the last live character.
+- **Ripples:** letters land on a pond, sending rings across the surface and bobbing nearby letters.
+- **Stars:** letters form constellations with delicate connections and gently twinkling points.
+
+The dock selects worlds, mutes sound, clears letters, enters fullscreen, and opens parent settings. Automatic rotation is off by default; parents can enable it and choose a duration and participating worlds. Settings also include shuffle, letter size, sound volume, separate keypress sounds, and gentler motion. Preferences stay in this browser. Sound starts after user interaction. Background tabs pause animation and rotation.
+
+Once play starts, the interface and cursor disappear after three seconds of pointer inactivity. Move the mouse, tap the screen, or press Tab to reveal the controls. Settings stay visible while open, and keyboard-focused controls remain visible.
+
+Story text stays visible without fading and scrolls upward as the page fills. Clear the page or switch worlds to start fresh. In the other worlds, each letter has its own 15-second lifespan and fades during its last two seconds, even when typing stops. New letters do not push out existing letters. Expiration uses foreground play time, so background tabs remain paused.
+
+## Play time limits
+
+Parent settings offer an optional 5, 10, 15, 20, or 30-minute play limit (off by default). The timer starts when play begins. At the deadline, a “Take a break” screen blocks typing, controls, animation, and sound for five minutes. A countdown shows when play will return.
+
+Session deadlines are saved in local browser storage. Refreshing or reopening the page preserves both the play deadline and any remaining break, and tabs on the same site share the session. Closing a tab does not pause the timer; time away counts toward the break. After a break, the next interaction starts a new session. Active breaks cannot be cancelled through parent settings.
+
+This is a browser-local family timer: clearing site data or using another browser/profile creates separate storage. If browser storage cannot save a timer, the app reports the failure rather than silently starting it.
+
+## Development
+
+```sh
+pnpm check   # TypeScript validation
+pnpm test        # Settings, keyboard mapping, and rotation tests
+pnpm build  # Validate and create dist/
+pnpm preview # Preview the production build
+pnpm format # Format source and contributor documentation
+```
+
+GitHub Actions runs tests and builds the game for pull requests and pushes to `main`. Successful pushes to `main` publish `dist/` to [GitHub Pages](https://quietcricket.github.io/taptaptap/). The pipeline is in `.github/workflows/pages.yml` and uses the pnpm version declared in `package.json`. A deployment can also be started from the workflow's **Run workflow** button.
+
+To configure a fork, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** and update the links above to your own account and repository. No deployment secrets are required; GitHub supplies the scoped workflow token.
+
+You can also deploy `dist/` to any static web host. The build uses relative asset paths so it can also live under a repository subdirectory.
+
+## Contribute a world
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the mode contract and a minimal example. Shared services live in `src/engine/`, worlds in `src/modes/`, and the HTML interface in `index.html` and `src/main.ts`.
+
+## Design direction
+
+Large letters, restrained colour, tactile sound, and playful systems inspired by Yugo Nakamura’s exploration of motion and simple rules. Every key should feel consequential. Keep controls quiet and leave room for discovery.
+
+## Licenses
+
+The application has no open-source license selected yet. Fredoka is distributed under the SIL Open Font License; see `node_modules/@fontsource-variable/fredoka/LICENSE` and the bundled font license in production output. Library licenses remain with their respective packages.
