@@ -27,7 +27,7 @@ Open the local address printed by Vite. Press a key or choose **Let’s play**. 
 - **Ripples:** letters land on a pond, sending rings across the surface and bobbing nearby letters.
 - **Stars:** letters form constellations with delicate connections and gently twinkling points.
 
-The dock selects worlds, mutes sound, clears letters, enters fullscreen, and opens parent settings. Automatic rotation is off by default; parents can enable it and choose a duration and participating worlds. Settings also include shuffle, letter size, sound volume, separate keypress sounds, and gentler motion. Preferences stay in this browser. Sound starts after user interaction. Background tabs pause animation and rotation.
+The dock selects worlds, mutes sound, clears letters, enters fullscreen, and opens parent settings. Worlds rotate automatically every 45 seconds by default; parents can turn rotation off or choose a different duration and participating worlds. Settings also include shuffle, letter size, sound volume, separate keypress sounds, and gentler motion. Preferences stay in this browser. Sound starts after user interaction. Background tabs pause animation and rotation.
 
 Once play starts, the interface and cursor disappear after three seconds of pointer inactivity. Move the mouse, tap the screen, or press Tab to reveal the controls. Settings stay visible while open, and keyboard-focused controls remain visible.
 

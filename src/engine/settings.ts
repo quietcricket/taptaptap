@@ -11,7 +11,7 @@ export interface Settings {
   storyText: string;
   playLimitMinutes: number;
 }
-export const SETTINGS_KEY = 'taptaptap.settings.v2';
+export const SETTINGS_KEY = 'taptaptap.settings.v3';
 export function normalizeSettings(
   raw: unknown,
   modeIds: string[],
@@ -29,7 +29,7 @@ export function normalizeSettings(
     ? modeIds.filter((id) => (input.includedModes as unknown[]).includes(id))
     : modeIds;
   return {
-    autoRotate: bool('autoRotate', false),
+    autoRotate: bool('autoRotate', true),
     playLimitMinutes: [0, 5, 10, 15, 20, 30].includes(
       input.playLimitMinutes as number,
     )

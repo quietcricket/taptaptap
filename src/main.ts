@@ -23,11 +23,14 @@ let stored: unknown;
 try {
   const saved = localStorage.getItem(SETTINGS_KEY);
   stored = JSON.parse(
-    saved ?? localStorage.getItem('taptaptap.settings.v1') ?? 'null',
+    saved ??
+      localStorage.getItem('taptaptap.settings.v2') ??
+      localStorage.getItem('taptaptap.settings.v1') ??
+      'null',
   );
-  // Preserve existing preferences while switching older installations to manual mode.
+  // Preserve other preferences while enabling rotation once for older installations.
   if (!saved && stored && typeof stored === 'object') {
-    stored = { ...stored, autoRotate: false };
+    stored = { ...stored, autoRotate: true };
   }
 } catch {
   /* Storage is optional. */
