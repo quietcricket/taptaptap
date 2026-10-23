@@ -13,6 +13,7 @@ export const tumbleMode: ModeDefinition = {
     const letters: { body: Matter.Body; text: Text }[] = [];
     let walls: Matter.Body[] = [];
     let accumulator = 0;
+    let wakePile = false;
     const floor = () => Math.max(160, ctx.bounds.height - 145);
     function resize() {
       Matter.Composite.remove(world.world, walls);
@@ -79,6 +80,7 @@ export const tumbleMode: ModeDefinition = {
             if (index !== -1) {
               Matter.Composite.remove(world.world, letters[index].body);
               letters.splice(index, 1);
+              wakePile = true;
             }
           },
         );
@@ -111,6 +113,12 @@ export const tumbleMode: ModeDefinition = {
         letters.push({ body, text });
       },
       update(delta) {
+        // Removing a support does not wake Matter's sleeping bodies automatically.
+        // Wake once per frame so the remaining letters fall into newly opened gaps.
+        if (wakePile) {
+          for (const { body } of letters) Matter.Sleeping.set(body, false);
+          wakePile = false;
+        }
         accumulator += delta;
         let steps = 0;
         while (accumulator >= 1 / 60 && steps++ < 4) {
