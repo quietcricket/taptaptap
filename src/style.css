@@ -189,10 +189,6 @@ button:disabled {
   font-size: 12px;
   letter-spacing: 0.3px;
 }
-.start-button span {
-  margin-left: 28px;
-  font-size: 16px;
-}
 .start-button:hover {
   background: #41463d;
 }
@@ -481,9 +477,6 @@ body.ui-idle #playground {
   }
 }
 @media (max-width: 480px) {
-  .contribute-arrow {
-    display: none;
-  }
   .live-label {
     display: none;
   }
