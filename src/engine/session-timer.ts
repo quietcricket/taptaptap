@@ -6,7 +6,13 @@ interface TimerStorage {
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
 }
+interface MathChallenge {
+  left: number;
+  right: number;
+  adjustment: number;
+}
 interface Session {
+  challenge: MathChallenge;
   startedAt: number;
   playUntil: number;
   breakUntil: number;
@@ -20,11 +26,17 @@ export interface SessionStatus {
 export class SessionTimer {
   private storage: TimerStorage;
   private now: () => number;
+  private random: () => number;
   private fallback: Session | null = null;
 
-  constructor(storage: TimerStorage, now: () => number = Date.now) {
+  constructor(
+    storage: TimerStorage,
+    now: () => number = Date.now,
+    random: () => number = Math.random,
+  ) {
     this.storage = storage;
     this.now = now;
+    this.random = random;
   }
 
   private read(): Session | null {
@@ -39,6 +51,23 @@ export class SessionTimer {
         raw.playUntil >= raw.startedAt &&
         raw.breakUntil === raw.playUntil + BREAK_DURATION
       ) {
+        const challenge = raw.challenge;
+        if (
+          !challenge ||
+          !Number.isInteger(challenge.left) ||
+          challenge.left < 31 ||
+          challenge.left > 89 ||
+          !Number.isInteger(challenge.right) ||
+          challenge.right < 12 ||
+          challenge.right > 29 ||
+          !Number.isInteger(challenge.adjustment) ||
+          challenge.adjustment < 41 ||
+          challenge.adjustment > 199
+        ) {
+          // Upgrade existing sessions once; refreshes reuse the saved question.
+          raw.challenge = this.createChallenge();
+          this.save(raw);
+        }
         this.fallback = raw;
         return raw;
       }
@@ -63,11 +92,45 @@ export class SessionTimer {
   status(): SessionStatus {
     const session = this.read();
     const now = this.now();
-    if (!session || now >= session.breakUntil)
-      return { phase: 'ready', remaining: 0 };
+    if (!session) return { phase: 'ready', remaining: 0 };
     if (now >= session.playUntil)
-      return { phase: 'break', remaining: session.breakUntil - now };
+      return {
+        phase: 'break',
+        remaining: Math.max(0, session.breakUntil - now),
+      };
     return { phase: 'playing', remaining: session.playUntil - now };
+  }
+
+  private createChallenge(): MathChallenge {
+    return {
+      left: 31 + Math.floor(this.random() * 59),
+      right: 12 + Math.floor(this.random() * 18),
+      adjustment: 41 + Math.floor(this.random() * 159),
+    };
+  }
+
+  question(): string | null {
+    const status = this.status();
+    if (status.phase !== 'break' || status.remaining > 0) return null;
+    const challenge = this.read()?.challenge;
+    return challenge
+      ? `(${challenge.left} × ${challenge.right}) + ${challenge.adjustment} = ?`
+      : null;
+  }
+
+  unlock(answer: string): 'unlocked' | 'incorrect' | 'waiting' | 'unavailable' {
+    const status = this.status();
+    if (status.phase !== 'break' || status.remaining > 0) return 'waiting';
+    const challenge = this.read()?.challenge;
+    const normalized = answer.trim();
+    if (
+      !challenge ||
+      !/^\d{1,6}$/.test(normalized) ||
+      Number(normalized) !==
+        challenge.left * challenge.right + challenge.adjustment
+    )
+      return 'incorrect';
+    return this.save(null) ? 'unlocked' : 'unavailable';
   }
 
   /** Repeated keypresses and reloads preserve an existing session or break. */
@@ -78,6 +141,7 @@ export class SessionTimer {
     return this.save({
       startedAt,
       playUntil,
+      challenge: this.createChallenge(),
       breakUntil: playUntil + BREAK_DURATION,
     });
   }

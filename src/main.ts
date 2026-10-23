@@ -113,14 +113,30 @@ function refreshSession(): SessionStatus {
       pendingKeys.length = 0;
       $('break-screen').focus({ preventScroll: true });
       $('announcement').textContent =
-        'Take a break. Play returns in five minutes.';
+        'Take a five-minute break, then ask a grown-up to unlock play.';
     } else {
       $('announcement').textContent = 'Your break is over. You can play again.';
       revealControls();
       focusPlay();
     }
   }
-  if (locked) $('break-countdown').textContent = formatTimer(status.remaining);
+  if (locked) {
+    const waiting = status.remaining > 0;
+    const form = $('break-unlock');
+    const showQuestion = form.hidden && !waiting;
+    $('break-countdown').hidden = !waiting;
+    $('break-countdown').textContent = formatTimer(status.remaining);
+    $('break-note').textContent = waiting
+      ? 'After five minutes, ask a grown-up to unlock the next round.'
+      : 'Break time is over. A grown-up can unlock the next round.';
+    form.hidden = waiting;
+    if (!waiting) $('break-question').textContent = sessionTimer.question();
+    if (showQuestion) {
+      $('break-answer').focus({ preventScroll: true });
+      $('announcement').textContent =
+        'Break time is over. Ask a grown-up to answer the math question.';
+    }
+  }
   const sessionStatus = $('session-status');
   sessionStatus.hidden = status.phase !== 'playing';
   if (status.phase === 'playing')
@@ -270,6 +286,12 @@ host.addEventListener('pointerdown', () => {
 });
 window.addEventListener('keydown', (event) => {
   if (refreshSession().phase === 'break') {
+    // The rest of the page remains inert; allow typing and Tab within the parent form.
+    if (
+      (event.target as HTMLElement)?.closest('#break-unlock') &&
+      !$('break-unlock').hidden
+    )
+      return;
     if (!event.ctrlKey && !event.metaKey) event.preventDefault();
     return;
   }
@@ -335,6 +357,26 @@ for (const [id, key] of [
     apply({ [key]: (event.target as HTMLInputElement).checked }),
   );
 }
+$('break-unlock').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const input = $<HTMLInputElement>('break-answer');
+  const result = sessionTimer.unlock(input.value);
+  if (result === 'unlocked') {
+    input.value = '';
+    $('break-feedback').textContent = '';
+    $('break-unlock').hidden = true;
+    refreshSession();
+    if (start()) focusPlay();
+  } else {
+    $('break-feedback').textContent =
+      result === 'incorrect'
+        ? 'That answer isn’t quite right. Try again.'
+        : result === 'waiting'
+          ? 'Let’s finish the five-minute break first.'
+          : 'The unlock could not be saved. Please try again.';
+    input.select();
+  }
+});
 $('play-limit').addEventListener('change', (event) =>
   apply({
     playLimitMinutes: Number((event.target as HTMLSelectElement).value),

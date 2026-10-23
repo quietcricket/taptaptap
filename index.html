@@ -180,7 +180,8 @@
         </select>
       </label>
       <p id="time-limit-note" class="panel-note timer-note">
-        Followed by a 5-minute break. Refreshing keeps the timer.
+        Followed by a 5-minute break and a grown-up math check. Refreshing keeps
+        the timer.
       </p>
       <label class="setting-row"
         >Switch worlds automatically<input id="auto-rotate" type="checkbox"
@@ -261,7 +262,33 @@
         >
           05:00
         </div>
-        <p class="break-note">Play returns when the countdown ends.</p>
+        <p id="break-note" class="break-note">
+          After five minutes, ask a grown-up to unlock the next round.
+        </p>
+        <form id="break-unlock" class="break-unlock" hidden>
+          <label for="break-answer">A little question for the grown-ups</label>
+          <p id="break-question" class="break-question"></p>
+          <div class="break-answer-row">
+            <input
+              id="break-answer"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="6"
+              autocomplete="off"
+              required
+              aria-describedby="break-question break-feedback"
+              placeholder="Your answer"
+            />
+            <button type="submit">Back to play</button>
+          </div>
+          <p
+            id="break-feedback"
+            class="break-feedback"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
       </div>
     </section>
     <div id="timer-error" class="timer-error" role="alert" hidden>

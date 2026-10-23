@@ -18,6 +18,10 @@ function fixture() {
   };
   return {
     saved,
+    answer: () => {
+      const { challenge } = JSON.parse(saved.get(SESSION_KEY));
+      return String(challenge.left * challenge.right + challenge.adjustment);
+    },
     storage,
     timer: new SessionTimer(storage, () => clock),
     reload: () => new SessionTimer(storage, () => clock),
@@ -28,6 +32,81 @@ function fixture() {
 }
 
 describe('persistent play sessions', () => {
+  it('does not accept even a correct answer before the break is complete', () => {
+    const f = fixture();
+    f.timer.begin(10);
+    f.advance(10 * 60_000);
+    assert.equal(f.timer.question(), null);
+    assert.equal(f.timer.unlock(f.answer()), 'waiting');
+    assert.equal(f.timer.status().remaining, BREAK_DURATION);
+  });
+  it('keeps the same question across reloads, wrong answers, and disabled timer attempts', () => {
+    const f = fixture();
+    f.timer.begin(10);
+    f.advance(15 * 60_000);
+    const question = f.timer.question();
+    const refreshed = f.reload();
+    assert.equal(refreshed.question(), question);
+    for (const wrong of ['', 'hello', '1', '1.5', '-1']) {
+      assert.equal(refreshed.unlock(wrong), 'incorrect');
+      assert.equal(refreshed.question(), question);
+    }
+    refreshed.configure(0);
+    refreshed.begin(30);
+    assert.deepEqual(refreshed.status(), { phase: 'break', remaining: 0 });
+    assert.equal(f.reload().question(), question);
+  });
+  it('cannot unlock if the successful answer cannot be persisted', () => {
+    const f = fixture();
+    f.timer.begin(10);
+    f.advance(15 * 60_000);
+    f.storage.removeItem = () => {
+      throw new Error('Storage blocked');
+    };
+    assert.equal(f.timer.unlock(f.answer()), 'unavailable');
+    assert.equal(f.reload().status().phase, 'break');
+  });
+  it('upgrades older sessions with one persisted question and keeps expired breaks locked', () => {
+    const f = fixture();
+    const startedAt = 0;
+    const playUntil = 60_000;
+    f.saved.set(
+      SESSION_KEY,
+      JSON.stringify({
+        startedAt,
+        playUntil,
+        breakUntil: playUntil + BREAK_DURATION,
+      }),
+    );
+    assert.equal(f.timer.status().phase, 'break');
+    const question = f.timer.question();
+    assert.ok(question);
+    assert.equal(f.reload().question(), question);
+    assert.equal(f.reload().unlock(f.answer()), 'unlocked');
+  });
+  it('creates a fresh random challenge for the next session', () => {
+    const f = fixture();
+    const first = new SessionTimer(
+      f.storage,
+      () => 1_000_000,
+      () => 0,
+    );
+    first.begin(10);
+    const oldChallenge = JSON.parse(f.saved.get(SESSION_KEY)).challenge;
+    f.advance(15 * 60_000);
+    f.timer.unlock(f.answer());
+    const next = new SessionTimer(
+      f.storage,
+      () => 2_000_000,
+      () => 0.9,
+    );
+    next.begin(10);
+    assert.notDeepEqual(
+      JSON.parse(f.saved.get(SESSION_KEY)).challenge,
+      oldChallenge,
+    );
+  });
+
   it('does not start a timer until play begins and leaves unlimited play alone', () => {
     const f = fixture();
     assert.equal(f.timer.status().phase, 'ready');
@@ -36,7 +115,7 @@ describe('persistent play sessions', () => {
     f.timer.begin(0);
     assert.equal(f.saved.has(SESSION_KEY), false);
   });
-  it('locks after ten minutes and stays locked for exactly five minutes', () => {
+  it('requires the full five-minute break and then a correct parent answer', () => {
     const f = fixture();
     f.timer.begin(10);
     f.advance(10 * 60_000 - 1);
@@ -49,6 +128,9 @@ describe('persistent play sessions', () => {
     f.advance(BREAK_DURATION - 1);
     assert.equal(f.timer.status().phase, 'break');
     f.advance(1);
+    assert.deepEqual(f.timer.status(), { phase: 'break', remaining: 0 });
+    assert.ok(f.timer.question());
+    assert.equal(f.timer.unlock(f.answer()), 'unlocked');
     assert.equal(f.timer.status().phase, 'ready');
   });
   it('keeps the original play deadline through refreshes and repeated keypresses', () => {
@@ -85,6 +167,8 @@ describe('persistent play sessions', () => {
       remaining: 60_000,
     });
     f.advance(2 * 60_000);
+    assert.deepEqual(f.reload().status(), { phase: 'break', remaining: 0 });
+    assert.equal(f.reload().unlock(f.answer()), 'unlocked');
     assert.equal(f.reload().status().phase, 'ready');
   });
   it('shares the same deadline across tabs and does not start the next session automatically', () => {
@@ -93,8 +177,10 @@ describe('persistent play sessions', () => {
     f.timer.begin(10);
     assert.equal(secondTab.status().phase, 'playing');
     f.advance(15 * 60_000);
-    assert.equal(secondTab.status().phase, 'ready');
+    assert.equal(secondTab.status().phase, 'break');
     f.advance(60_000);
+    assert.equal(f.timer.status().phase, 'break');
+    assert.equal(secondTab.unlock(f.answer()), 'unlocked');
     assert.equal(f.timer.status().phase, 'ready');
     secondTab.begin(10);
     assert.deepEqual(f.timer.status(), {
