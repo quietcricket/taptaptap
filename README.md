@@ -35,9 +35,9 @@ Story text stays visible without fading and scrolls upward as the page fills. Cl
 
 ## Play time limits
 
-Parent settings offer an optional 5, 10, 15, 20, or 30-minute play limit (off by default). The timer starts when play begins. At the deadline, a “Take a break” screen blocks typing, controls, animation, and sound for five minutes. When the countdown finishes, a grown-up must solve a random multiplication-and-addition question to unlock play.
+Parent settings offer an optional 5, 10, 15, 20, or 30-minute play limit (off by default). The timer starts when play begins. At the deadline, a “Take a break” screen blocks typing, controls, animation, and sound for five minutes. Play returns automatically when the countdown ends. A grown-up can optionally solve a random multiplication-and-addition question to skip the remaining break.
 
-Session deadlines are saved in local browser storage. Refreshing or reopening the page preserves both the play deadline and any remaining break, and tabs on the same site share the session. Closing a tab does not pause the timer; time away counts toward the break. The question and lock survive refreshes, wrong answers, and reopening the page. A correct answer is accepted only after the full five minutes and starts a fresh play session. Active breaks cannot be cancelled through parent settings.
+Session deadlines are saved in local browser storage. Refreshing or reopening the page preserves both the play deadline and any remaining break, and tabs on the same site share the session. Closing a tab does not pause the timer; time away counts toward the break. The question and remaining break survive refreshes, wrong answers, and reopening the page. A correct answer skips the wait and starts a fresh play session; no answer is needed to resume after five minutes. Active breaks cannot be cancelled through parent settings.
 
 This is a browser-local family timer: clearing site data or using another browser/profile creates separate storage. If browser storage cannot save a timer, the app reports the failure rather than silently starting it.
 

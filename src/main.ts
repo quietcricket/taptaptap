@@ -111,9 +111,11 @@ function refreshSession(): SessionStatus {
       toggle.setAttribute('aria-expanded', 'false');
       toggle.setAttribute('aria-label', 'Open parent settings');
       pendingKeys.length = 0;
+      $<HTMLInputElement>('break-answer').value = '';
+      $('break-feedback').textContent = '';
       $('break-screen').focus({ preventScroll: true });
       $('announcement').textContent =
-        'Take a five-minute break, then ask a grown-up to unlock play.';
+        'Take a five-minute break. A grown-up can optionally skip the wait.';
     } else {
       $('announcement').textContent = 'Your break is over. You can play again.';
       revealControls();
@@ -121,21 +123,12 @@ function refreshSession(): SessionStatus {
     }
   }
   if (locked) {
-    const waiting = status.remaining > 0;
-    const form = $('break-unlock');
-    const showQuestion = form.hidden && !waiting;
-    $('break-countdown').hidden = !waiting;
+    $('break-countdown').hidden = false;
     $('break-countdown').textContent = formatTimer(status.remaining);
-    $('break-note').textContent = waiting
-      ? 'After five minutes, ask a grown-up to unlock the next round.'
-      : 'Break time is over. A grown-up can unlock the next round.';
-    form.hidden = waiting;
-    if (!waiting) $('break-question').textContent = sessionTimer.question();
-    if (showQuestion) {
-      $('break-answer').focus({ preventScroll: true });
-      $('announcement').textContent =
-        'Break time is over. Ask a grown-up to answer the math question.';
-    }
+    $('break-unlock').hidden = false;
+    $('break-question').textContent = sessionTimer.question();
+  } else {
+    $('break-unlock').hidden = true;
   }
   const sessionStatus = $('session-status');
   sessionStatus.hidden = status.phase !== 'playing';
@@ -372,9 +365,10 @@ $('break-unlock').addEventListener('submit', (event) => {
       result === 'incorrect'
         ? 'That answer isn’t quite right. Try again.'
         : result === 'waiting'
-          ? 'Let’s finish the five-minute break first.'
+          ? 'The break has ended. You can play again.'
           : 'The unlock could not be saved. Please try again.';
     input.select();
+    refreshSession();
   }
 });
 $('play-limit').addEventListener('change', (event) =>

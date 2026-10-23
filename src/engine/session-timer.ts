@@ -92,7 +92,8 @@ export class SessionTimer {
   status(): SessionStatus {
     const session = this.read();
     const now = this.now();
-    if (!session) return { phase: 'ready', remaining: 0 };
+    if (!session || now >= session.breakUntil)
+      return { phase: 'ready', remaining: 0 };
     if (now >= session.playUntil)
       return {
         phase: 'break',
@@ -111,7 +112,7 @@ export class SessionTimer {
 
   question(): string | null {
     const status = this.status();
-    if (status.phase !== 'break' || status.remaining > 0) return null;
+    if (status.phase !== 'break') return null;
     const challenge = this.read()?.challenge;
     return challenge
       ? `(${challenge.left} × ${challenge.right}) + ${challenge.adjustment} = ?`
@@ -120,7 +121,7 @@ export class SessionTimer {
 
   unlock(answer: string): 'unlocked' | 'incorrect' | 'waiting' | 'unavailable' {
     const status = this.status();
-    if (status.phase !== 'break' || status.remaining > 0) return 'waiting';
+    if (status.phase !== 'break') return 'waiting';
     const challenge = this.read()?.challenge;
     const normalized = answer.trim();
     if (
