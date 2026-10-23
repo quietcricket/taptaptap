@@ -128,6 +128,9 @@ button:disabled {
   text-decoration: none;
   pointer-events: auto;
 }
+.github-icon {
+  flex-shrink: 0;
+}
 .contribute-button:hover {
   background: #eeeee5;
   border-color: #85877e;
@@ -478,6 +481,9 @@ body.ui-idle #playground {
   }
 }
 @media (max-width: 480px) {
+  .contribute-arrow {
+    display: none;
+  }
   .live-label {
     display: none;
   }

@@ -68,3 +68,5 @@ Large letters, restrained colour, tactile sound, and playful systems inspired by
 ## Licenses
 
 The application has no open-source license selected yet. Fredoka is distributed under the SIL Open Font License; see `node_modules/@fontsource-variable/fredoka/LICENSE` and the bundled font license in production output. Library licenses remain with their respective packages.
+
+The GitHub icon is from [Primer Octicons](https://github.com/primer/octicons), distributed under the [MIT license](public/licenses/octicons.txt).
