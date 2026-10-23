@@ -53,7 +53,7 @@ pnpm format # Format source and contributor documentation
 
 GitHub Actions runs tests and builds the game for pull requests and pushes to `main`. Successful pushes to `main` publish `dist/` to [GitHub Pages](https://quietcricket.github.io/taptaptap/). The pipeline is in `.github/workflows/pages.yml` and uses the pnpm version declared in `package.json`. A deployment can also be started from the workflow's **Run workflow** button.
 
-To configure a fork, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** and update the links above to your own account and repository. No deployment secrets are required; GitHub supplies the scoped workflow token.
+To configure a fork, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** and update the links above and the canonical/social preview URLs in `index.html` to your own account and repository. No deployment secrets are required; GitHub supplies the scoped workflow token.
 
 You can also deploy `dist/` to any static web host. The build uses relative asset paths so it can also live under a repository subdirectory.
 
