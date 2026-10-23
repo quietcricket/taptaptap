@@ -114,6 +114,24 @@ button:disabled {
   border-radius: 50%;
   background: #8a9c7c;
 }
+.contribute-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 11px 15px;
+  border: 1px solid #d7d7cd;
+  border-radius: 24px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-size: 11px;
+  text-decoration: none;
+  pointer-events: auto;
+}
+.contribute-button:hover {
+  background: #eeeee5;
+  border-color: #85877e;
+}
 .mode-caption {
   position: fixed;
   top: 112px;
@@ -396,7 +414,8 @@ body.ui-idle .play-hint {
   visibility: hidden;
   pointer-events: none;
 }
-body.ui-idle .wordmark {
+body.ui-idle .wordmark,
+body.ui-idle .contribute-button {
   pointer-events: none;
 }
 body.ui-idle #playground {
@@ -405,6 +424,7 @@ body.ui-idle #playground {
 @media (max-width: 650px) {
   .masthead {
     padding: 22px;
+    gap: 16px;
   }
   .edition {
     display: none;
@@ -455,6 +475,17 @@ body.ui-idle #playground {
   }
   .welcome h1 {
     letter-spacing: -0.8px;
+  }
+}
+@media (max-width: 480px) {
+  .live-label {
+    display: none;
+  }
+  .contribute-button {
+    margin-left: auto;
+    padding: 10px 12px;
+    gap: 8px;
+    font-size: 10px;
   }
 }
 @media (max-width: 390px) {
