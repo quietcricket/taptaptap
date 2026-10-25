@@ -18,11 +18,15 @@ Follow the conventions of the language and framework introduced by the project. 
 
 ## Testing Guidelines
 
-No testing framework or coverage threshold is established. Introduce automated tests alongside meaningful behavior. Use descriptive test names that identify the behavior and expected outcome. Document the test runner, file naming convention, and execution command when tests are added.
+Use checks proportional to the change; do not run the full test suite or production build after every edit. For a focused behavior change, run the relevant test file, for example `node --experimental-strip-types --test tests/tumble.test.mjs`. Use `pnpm check` when TypeScript validation is relevant. Documentation-only changes do not require tests; simple visual changes usually need a visual check.
+
+Run `pnpm test` for changes affecting several modes or shared engine behavior, before merging to `main`, or when explicitly requested. Run `pnpm build` for build, dependency, deployment, or asset changes. Once appropriate checks pass, do not repeat or broaden them without new changes, failures, or unresolved concerns. Add regression tests for meaningful bugs, and report the checks actually performed.
 
 ## Commit & Pull Request Guidelines
 
 No Git history is available to establish commit conventions. Use concise, imperative commit subjects, such as `Add initial application structure`, and keep changes focused.
+
+Work on `dev`. Merge or push to `main` only when the user explicitly requests it; pushes to `main` deploy the live game. Do not monitor GitHub workflow runs unless requested.
 
 Pull requests should explain the change, include validation performed, and link relevant issues. Add screenshots for visible interface changes. Explicitly note any unavailable checks or required configuration.
 

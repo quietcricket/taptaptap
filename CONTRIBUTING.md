@@ -7,7 +7,7 @@ The easiest contribution is a new world. Keep its behaviour self-contained so an
 1. Create `src/modes/your-mode.ts`, exporting a `ModeDefinition`.
 2. Register it in `src/modes/index.ts`. The controls and rotation settings discover registered modes automatically.
 3. Run `pnpm dev` and select the world in the dock.
-4. Run `pnpm build` and `pnpm test` before opening a pull request.
+4. Run checks appropriate to your change. Use a targeted test file for a focused fix, `pnpm check` for TypeScript validation, and the full suite before merging to `main`.
 
 ```ts
 import type { ModeDefinition } from '../engine/types';
@@ -53,6 +53,8 @@ The engine destroys the mode container and its display objects. Dispose your own
 Keep objects bounded in number, avoid flashing effects, and honor `ctx.reducedMotion`. Call `ctx.sound` sparingly for collisions; strength is a value from 0 to 1. Avoid remote assets and analytics. New sounds should stay short and quiet.
 
 ## Review and manual checks
+
+Do not run the full suite or production build after every edit. Documentation-only changes need no tests; simple visual changes usually need a visual check. For a focused mode fix, run its relevant test file, such as `node --experimental-strip-types --test tests/tumble.test.mjs`. Run `pnpm test` for changes spanning modes or shared engine behavior, before merging, or when requested. Run `pnpm build` for build, dependency, deployment, or asset changes. Repeat checks only when new changes, failures, or unresolved concerns justify it.
 
 Use two-space indentation and Prettier. Prefer small TypeScript modules and descriptive names. Use concise imperative commit subjects. Pull requests should explain the behaviour and validation, with a screenshot or short recording for visible changes.
 

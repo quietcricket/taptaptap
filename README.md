@@ -51,7 +51,7 @@ pnpm preview # Preview the production build
 pnpm format # Format source and contributor documentation
 ```
 
-GitHub Actions runs tests and builds the game for pull requests and pushes to `main`. Successful pushes to `main` publish `dist/` to [GitHub Pages](https://quietcricket.github.io/taptaptap/). The pipeline is in `.github/workflows/pages.yml` and uses the pnpm version declared in `package.json`. A deployment can also be started from the workflow's **Run workflow** button.
+GitHub Actions runs tests and builds the game only on pushes to `main` or manual runs targeting `main`. Pull requests and pushes to other branches do not trigger the workflow. Successful pushes to `main` publish `dist/` to [GitHub Pages](https://quietcricket.github.io/taptaptap/). The pipeline is in `.github/workflows/pages.yml` and uses the pnpm version declared in `package.json`. A deployment can also be started from the workflow's **Run workflow** button with `main` selected; manual runs on other branches skip all jobs.
 
 To configure a fork, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** and update the links above and the canonical/social preview URLs in `index.html` to your own account and repository. No deployment secrets are required; GitHub supplies the scoped workflow token.
 
