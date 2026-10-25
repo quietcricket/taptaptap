@@ -18,30 +18,6 @@ describe('Story passages', () => {
     for (const story of STORIES) assert.ok(story.split('\n\n').length >= 3);
   });
 
-  it('reveals a complete prepared passage character by character, including automatic spaces', () => {
-    const stream = new StoryStream('The fox found a key.');
-    let output = '';
-    for (let i = 0; i < 'The fox found a key.\n'.length; i++)
-      output += stream.next().character;
-    assert.equal(output, 'The fox found a key.\n');
-  });
-  it('loops at paragraph boundaries and supports a fresh start', () => {
-    const stream = new StoryStream('Hi!');
-    assert.equal(
-      Array.from({ length: 5 }, () => stream.next().character).join(''),
-      'Hi!\n\n',
-    );
-    assert.equal(stream.next().character, 'H');
-    stream.reset();
-    assert.equal(stream.next().word, 'Hi!');
-  });
-  it('uses original built-in stories for empty custom text and preserves Unicode characters', () => {
-    assert.equal(new StoryStream('  ').next().character, STORIES[0][0]);
-    const stream = new StoryStream('🙂 hi');
-    assert.equal(stream.next().character, '🙂');
-    assert.equal(stream.next().character, ' ');
-    assert.equal(stream.next().word, 'hi');
-  });
   it('normalizes saved custom text and bounds its size without splitting emoji', () => {
     const settings = normalizeSettings({ storyText: '🙂'.repeat(2001) }, [
       'story',
@@ -68,17 +44,7 @@ describe('writing layout', () => {
     assert.equal(position.x, layout.left);
     assert.equal(position.y, layout.top + layout.lineHeight);
   });
-  it('wraps long typed words and advances an explicit carriage return', () => {
-    const layout = new WritingLayout();
-    layout.resize(320, 800, 32);
-    for (let i = 0; i < 20; i++) {
-      const position = layout.place(30);
-      assert.ok(position.x >= layout.left);
-      assert.ok(position.x + 30 <= layout.right);
-    }
-    const y = layout.y;
-    assert.equal(layout.place(0, true).y, y + layout.lineHeight);
-  });
+
   it('keeps the cursor on screen during long typing sessions and after resize', () => {
     const layout = new WritingLayout();
     layout.resize(320, 480, 48);

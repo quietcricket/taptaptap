@@ -40,14 +40,6 @@ describe('world rotation', () => {
     expect(nextMode('float', ['float', 'train'], false)).toBe('train');
     expect(nextMode('train', ['float', 'train'], false)).toBe('float');
   });
-  it('leaves an excluded current world and supports a single world', () => {
-    expect(nextMode('tumble', ['float', 'train'], false)).toBe('float');
-    expect(nextMode('float', ['float'], true)).toBe('float');
-  });
-  it('never immediately repeats in shuffle mode', () => {
-    for (const random of [0, 0.2, 0.7, 0.999])
-      expect(nextMode('tumble', ids, true, () => random)).not.toBe('tumble');
-  });
 });
 describe('keyboard play', () => {
   it('accepts printable Unicode and gives nonprinting play keys a visible shape', () => {

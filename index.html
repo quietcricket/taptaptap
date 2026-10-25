@@ -65,8 +65,6 @@
       <a class="wordmark" href="./" aria-label="taptaptap home"
         >tap<span>tap</span>tap<span class="logo-dot">.</span></a
       >
-      <div class="edition">A LITTLE WORLD FOR EVERY KEY</div>
-      <div class="live-label"><span></span> FREE PLAY</div>
       <a
         class="contribute-button"
         href="https://github.com/quietcricket/taptaptap/blob/main/CONTRIBUTING.md"
@@ -90,20 +88,10 @@
         Contribute a mode</a
       >
     </header>
-    <div class="mode-caption" aria-hidden="true">
-      <span id="mode-number">01 / 07</span
-      ><span id="mode-description">Letters, lighter than air.</span>
-    </div>
     <section class="welcome" id="welcome" aria-label="Welcome">
-      <span class="eyebrow">YOUR KEYBOARD IS THE PLAYGROUND</span>
       <h1>Make a little<br />keyboard magic<span>.</span></h1>
-      <p>No right keys. No wrong keys. Just press something.</p>
-      <button id="start" class="start-button">Let’s play</button>
-      <span class="start-note">or start typing right away</span>
+      <button id="start" class="start-button">Start typing</button>
     </section>
-    <div class="play-hint" id="play-hint" hidden>
-      keep going. see what happens.
-    </div>
     <footer class="bottom-bar">
       <div class="dock" role="toolbar" aria-label="Playground controls">
         <div
@@ -149,15 +137,11 @@
         </button>
       </div>
       <div id="session-status" class="session-status" hidden></div>
-      <div class="rotation-status">
-        <span class="status-dot"></span
-        ><span id="rotation-status">STAY A LITTLE LONGER</span>
-      </div>
+      <div id="rotation-status" class="rotation-status" hidden></div>
     </footer>
     <section id="settings" class="settings" aria-label="Parent settings" hidden>
       <div class="panel-heading">
         <div>
-          <span class="eyebrow">FOR THE GROWN-UPS</span>
           <h2>A little fine-tuning.</h2>
         </div>
         <button
@@ -232,10 +216,6 @@
           Click outside to save.
         </p>
       </div>
-      <p class="panel-note">
-        Made for curious hands. No scores, accounts, or tracking.<br />Browser
-        and system shortcuts can still leave the page.
-      </p>
     </section>
     <section
       id="break-screen"
@@ -249,7 +229,6 @@
     >
       <div class="break-card">
         <span class="break-symbol" aria-hidden="true">☀</span>
-        <span class="eyebrow">A LITTLE TIME AWAY</span>
         <h1 id="break-title">Take a break<span>.</span></h1>
         <p id="break-description">
           Rest your hands. Stretch your legs.<br />Your little world will be

@@ -15,13 +15,13 @@ pnpm install
 pnpm dev
 ```
 
-Open the local address printed by Vite. Press a key or choose **Let’s play**. Physical keyboards are the primary input; browser and OS shortcuts remain available.
+Open the local address printed by Vite. Press a key or choose **Start typing**. Physical keyboards are the primary input; browser and OS shortcuts remain available.
 
 ## Worlds
 
 - **Float:** letters drift upward with a gentle sway.
 - **Tumble:** letters fall, bounce, and collect in a pile. Rounded collision boxes approximate the glyphs.
-- **Train:** letters join a moving chain and follow their neighbours.
+- **Train:** letters join the tail of a train moving from a random starting point, making right-angle turns throughout the play area; each new letter gives it a little push that gently tapers back to cruising speed, with a soft choo-choo whistle as you type.
 - **Story:** any play key reveals the next character of a prepared passage, with automatic spaces, punctuation, and word wrapping. Twelve original three-paragraph stories flow one after another; pauses do not reset the passage. Add your own passage in parent settings; it stays in this browser.
 - **Typewriter:** actual typed characters form lines of text with a blinking cursor. Space inserts a space, Enter starts a new line, and Backspace removes the last live character.
 - **Ripples:** letters land on a pond, sending rings across the surface and bobbing nearby letters.
