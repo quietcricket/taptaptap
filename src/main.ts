@@ -53,7 +53,7 @@ const sessionTimer = new SessionTimer({
 });
 let onBreak = false;
 const playSurfaces = document.querySelectorAll<HTMLElement>(
-  '#playground, .masthead, .mode-caption, #welcome, #play-hint, .bottom-bar, #settings',
+  '#playground, .masthead, #welcome, .bottom-bar, #settings',
 );
 let started = false;
 let ready = false;
@@ -147,7 +147,6 @@ function start(): boolean {
   if (!started) {
     started = true;
     $('welcome').hidden = true;
-    $('play-hint').hidden = false;
     revealControls();
   }
   playground.unlockSound();
@@ -258,14 +257,12 @@ playground.onModeChange = (id) => {
     button.setAttribute('aria-pressed', String(modeId === id));
   modeButtons.get(id)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   const index = modes.findIndex((mode) => mode.id === id);
-  $('mode-number').textContent =
-    `${String(index + 1).padStart(2, '0')} / ${String(modes.length).padStart(2, '0')}`;
-  $('mode-description').textContent = modes[index].description;
   $('announcement').textContent = `${modes[index].name} world`;
 };
 playground.onCountdown = (seconds) => {
-  $('rotation-status').textContent =
-    seconds === null ? 'STAY A LITTLE LONGER' : `NEXT WORLD IN ${seconds}s`;
+  const status = $('rotation-status');
+  status.hidden = seconds === null;
+  status.textContent = seconds === null ? '' : `NEXT WORLD IN ${seconds}s`;
 };
 
 $('start').addEventListener('click', () => {

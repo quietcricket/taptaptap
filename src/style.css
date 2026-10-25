@@ -86,35 +86,13 @@ button:disabled {
 .logo-dot {
   color: var(--accent);
 }
-.edition,
-.live-label,
-.eyebrow,
-.mode-caption,
 .rotation-status {
   font-size: 10px;
   letter-spacing: 1.7px;
   font-weight: 600;
 }
-.edition {
-  border-left: 1px solid #d7d7cd;
-  padding-left: 28px;
-  color: var(--muted);
-}
-.live-label {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.live-label > span,
-.status-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #8a9c7c;
-}
 .contribute-button {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -135,19 +113,6 @@ button:disabled {
   background: #eeeee5;
   border-color: #85877e;
 }
-.mode-caption {
-  position: fixed;
-  top: 112px;
-  left: 43px;
-  display: flex;
-  gap: 16px;
-  color: var(--muted);
-  pointer-events: none;
-  letter-spacing: 1px;
-}
-.mode-caption > span:first-child {
-  color: var(--accent);
-}
 .welcome {
   position: fixed;
   top: 46%;
@@ -156,11 +121,6 @@ button:disabled {
   width: min(600px, 90vw);
   text-align: center;
   pointer-events: none;
-}
-.eyebrow {
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 2px;
 }
 .welcome h1 {
   font-family: 'Fredoka Variable', sans-serif;
@@ -172,11 +132,6 @@ button:disabled {
 }
 .welcome h1 > span {
   color: var(--accent);
-}
-.welcome p {
-  font-size: 14px;
-  color: #7b7e75;
-  line-height: 1.6;
 }
 .start-button {
   pointer-events: auto;
@@ -191,12 +146,6 @@ button:disabled {
 }
 .start-button:hover {
   background: #41463d;
-}
-.start-note {
-  display: block;
-  margin-top: 17px;
-  font-size: 10px;
-  color: var(--muted);
 }
 .bottom-bar {
   position: fixed;
@@ -282,19 +231,6 @@ button:disabled {
   font-size: 8px;
   letter-spacing: 1.4px;
   color: var(--muted);
-}
-.status-dot {
-  width: 4px;
-  height: 4px;
-}
-.play-hint {
-  position: fixed;
-  top: 124px;
-  right: 43px;
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: 0.6px;
-  pointer-events: none;
 }
 .settings {
   position: fixed;
@@ -398,17 +334,13 @@ legend {
   line-height: 1.6;
 }
 .masthead,
-.mode-caption,
-.bottom-bar,
-.play-hint {
+.bottom-bar {
   transition:
     opacity 300ms ease,
     visibility 300ms;
 }
 body.ui-idle .masthead,
-body.ui-idle .mode-caption,
-body.ui-idle .bottom-bar,
-body.ui-idle .play-hint {
+body.ui-idle .bottom-bar {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -425,25 +357,8 @@ body.ui-idle #playground {
     padding: 22px;
     gap: 16px;
   }
-  .edition {
-    display: none;
-  }
   .wordmark {
     font-size: 27px;
-  }
-  .live-label {
-    font-size: 8px;
-  }
-  .mode-caption {
-    left: 23px;
-    top: 86px;
-    font-size: 8px;
-    gap: 10px;
-  }
-  .play-hint {
-    top: 110px;
-    left: 23px;
-    font-size: 9px;
   }
   .mode-button {
     padding: 11px 10px;
@@ -469,17 +384,11 @@ body.ui-idle #playground {
     right: 14px;
     bottom: 120px;
   }
-  .welcome p {
-    font-size: 12px;
-  }
   .welcome h1 {
     letter-spacing: -0.8px;
   }
 }
 @media (max-width: 480px) {
-  .live-label {
-    display: none;
-  }
   .contribute-button {
     margin-left: auto;
     padding: 10px 12px;
@@ -503,9 +412,7 @@ body.ui-idle #playground {
     scroll-behavior: auto !important;
   }
   .masthead,
-  .mode-caption,
-  .bottom-bar,
-  .play-hint {
+  .bottom-bar {
     transition: none;
   }
 }
@@ -566,9 +473,6 @@ body.ui-idle #playground {
   font-size: 68px;
   color: #d2ad54;
   margin-bottom: 24px;
-}
-.break-card .eyebrow {
-  display: block;
 }
 .break-card h1 {
   font-family: 'Fredoka Variable', sans-serif;

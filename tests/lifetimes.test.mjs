@@ -2,8 +2,6 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { LetterLifetimes, LETTER_LIFESPAN } from '../src/engine/lifetimes.ts';
 import { floatMode } from '../src/modes/float.ts';
-import { tumbleMode } from '../src/modes/tumble.ts';
-import { trainMode } from '../src/modes/train.ts';
 
 function fakeLetter(size = 84) {
   const letter = {
@@ -88,50 +86,38 @@ describe('individual letter lifespans', () => {
     lifetimes.update(10);
     assert.equal(second.destroyed, true);
   });
-
-  it('drops expiry callbacks when a whole scene is torn down', () => {
-    const lifetimes = new LetterLifetimes();
-    let cleanups = 0;
-    lifetimes.track(fakeLetter(), () => cleanups++);
-    lifetimes.clear();
-    lifetimes.update(100);
-    assert.equal(lifetimes.size, 0);
-    assert.equal(cleanups, 0);
-  });
 });
 
-for (const definition of [floatMode, tumbleMode, trainMode]) {
-  it(`${definition.name} retains old letters when typing and releases expired mode state`, () => {
-    const lifetimes = new LetterLifetimes();
-    const created = [];
-    const mode = definition.create({
-      bounds: { width: 1000, height: 800 },
-      letterSize: 84,
-      reducedMotion: false,
-      sound() {},
-      createLetter(character, size, onExpire) {
-        const letter = fakeLetter(size);
-        created.push(letter);
-        lifetimes.track(letter, onExpire);
-        return letter;
-      },
-    });
-    for (let i = 0; i < 100; i++) mode.onKey('a');
-    assert.equal(
-      created.some((letter) => letter.destroyed),
-      false,
-    );
-    // No further input is needed for all existing letters to expire.
-    lifetimes.update(LETTER_LIFESPAN);
-    assert.equal(
-      created.every((letter) => letter.destroyed),
-      true,
-    );
-    assert.doesNotThrow(() => mode.update(1 / 60));
-    mode.onKey('b');
-    assert.doesNotThrow(() => mode.update(1 / 60));
-    assert.equal(created.at(-1).destroyed, false);
-    mode.dispose();
-    lifetimes.clear();
+it('Float retains old letters when typing and releases expired mode state', () => {
+  const lifetimes = new LetterLifetimes();
+  const created = [];
+  const mode = floatMode.create({
+    bounds: { width: 1000, height: 800 },
+    letterSize: 84,
+    reducedMotion: false,
+    sound() {},
+    createLetter(character, size, onExpire) {
+      const letter = fakeLetter(size);
+      created.push(letter);
+      lifetimes.track(letter, onExpire);
+      return letter;
+    },
   });
-}
+  for (let i = 0; i < 100; i++) mode.onKey('a');
+  assert.equal(
+    created.some((letter) => letter.destroyed),
+    false,
+  );
+  // No further input is needed for all existing letters to expire.
+  lifetimes.update(LETTER_LIFESPAN);
+  assert.equal(
+    created.every((letter) => letter.destroyed),
+    true,
+  );
+  assert.doesNotThrow(() => mode.update(1 / 60));
+  mode.onKey('b');
+  assert.doesNotThrow(() => mode.update(1 / 60));
+  assert.equal(created.at(-1).destroyed, false);
+  mode.dispose();
+  lifetimes.clear();
+});

@@ -1,6 +1,6 @@
 import type { Container, Text } from 'pixi.js';
 
-export type SoundKind = 'tap' | 'pop' | 'clink' | 'thud';
+export type SoundKind = 'tap' | 'pop' | 'clink' | 'thud' | 'choo';
 export interface Bounds {
   width: number;
   height: number;

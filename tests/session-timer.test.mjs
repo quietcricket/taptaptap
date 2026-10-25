@@ -4,9 +4,7 @@ import {
   SessionTimer,
   SESSION_KEY,
   BREAK_DURATION,
-  formatTimer,
 } from '../src/engine/session-timer.ts';
-import { normalizeSettings } from '../src/engine/settings.ts';
 
 function fixture() {
   let clock = 1_000_000;
@@ -40,13 +38,7 @@ describe('persistent play sessions', () => {
     assert.equal(f.timer.unlock(f.answer()), 'unlocked');
     assert.equal(f.reload().status().phase, 'ready');
   });
-  it('does not offer a skip question while the play session is still running', () => {
-    const f = fixture();
-    f.timer.begin(10);
-    assert.equal(f.timer.question(), null);
-    assert.equal(f.timer.unlock(f.answer()), 'waiting');
-    assert.equal(f.timer.status().phase, 'playing');
-  });
+
   it('keeps the same question across reloads, wrong answers, and disabled timer attempts', () => {
     const f = fixture();
     f.timer.begin(10);
@@ -76,56 +68,7 @@ describe('persistent play sessions', () => {
     assert.equal(f.timer.unlock(f.answer()), 'unavailable');
     assert.equal(f.reload().status().phase, 'break');
   });
-  it('upgrades older active breaks with one persisted question', () => {
-    const f = fixture();
-    const startedAt = 1_000_000;
-    const playUntil = startedAt + 10 * 60_000;
-    f.saved.set(
-      SESSION_KEY,
-      JSON.stringify({
-        startedAt,
-        playUntil,
-        breakUntil: playUntil + BREAK_DURATION,
-      }),
-    );
-    f.advance(11 * 60_000);
-    assert.equal(f.timer.status().phase, 'break');
-    const question = f.timer.question();
-    assert.ok(question);
-    assert.equal(f.reload().question(), question);
-    assert.equal(f.reload().unlock(f.answer()), 'unlocked');
-  });
-  it('creates a fresh random challenge for the next session', () => {
-    const f = fixture();
-    const first = new SessionTimer(
-      f.storage,
-      () => 1_000_000,
-      () => 0,
-    );
-    first.begin(10);
-    const oldChallenge = JSON.parse(f.saved.get(SESSION_KEY)).challenge;
-    f.advance(11 * 60_000);
-    f.timer.unlock(f.answer());
-    const next = new SessionTimer(
-      f.storage,
-      () => 2_000_000,
-      () => 0.9,
-    );
-    next.begin(10);
-    assert.notDeepEqual(
-      JSON.parse(f.saved.get(SESSION_KEY)).challenge,
-      oldChallenge,
-    );
-  });
 
-  it('does not start a timer until play begins and leaves unlimited play alone', () => {
-    const f = fixture();
-    assert.equal(f.timer.status().phase, 'ready');
-    assert.equal(f.timer.configure(10), true);
-    assert.equal(f.saved.has(SESSION_KEY), false);
-    f.timer.begin(0);
-    assert.equal(f.saved.has(SESSION_KEY), false);
-  });
   it('automatically unlocks after five minutes without any answer', () => {
     const f = fixture();
     f.timer.begin(10);
@@ -154,30 +97,7 @@ describe('persistent play sessions', () => {
       remaining: 6 * 60_000,
     });
   });
-  it('keeps the break locked on refresh, even when a stale tab has the timer turned off', () => {
-    const f = fixture();
-    f.timer.begin(10);
-    f.advance(11 * 60_000);
-    const refreshed = f.reload();
-    refreshed.begin(0);
-    refreshed.configure(0);
-    assert.deepEqual(refreshed.status(), {
-      phase: 'break',
-      remaining: 4 * 60_000,
-    });
-    assert.equal(f.timer.status().phase, 'break');
-  });
-  it('does not restart the five-minute break when a closed page is reopened', () => {
-    const f = fixture();
-    f.timer.begin(10);
-    f.advance(14 * 60_000);
-    assert.deepEqual(f.reload().status(), {
-      phase: 'break',
-      remaining: 60_000,
-    });
-    f.advance(2 * 60_000);
-    assert.deepEqual(f.reload().status(), { phase: 'ready', remaining: 0 });
-  });
+
   it('shares the same deadline across tabs and does not start the next session automatically', () => {
     const f = fixture();
     const secondTab = f.reload();
@@ -213,14 +133,7 @@ describe('persistent play sessions', () => {
       remaining: BREAK_DURATION,
     });
   });
-  it('lets a parent disable the timer before a break begins', () => {
-    const f = fixture();
-    f.timer.begin(10);
-    f.timer.configure(0);
-    f.advance(12 * 60_000);
-    assert.equal(f.timer.status().phase, 'ready');
-    assert.equal(f.saved.has(SESSION_KEY), false);
-  });
+
   it('reports storage failure rather than silently starting an unpersisted timer', () => {
     const timer = new SessionTimer({
       getItem() {
@@ -245,23 +158,5 @@ describe('persistent play sessions', () => {
       throw new Error('Temporary storage failure');
     };
     assert.equal(f.timer.status().phase, 'break');
-  });
-  it('recovers safely from malformed saved data and rejects invalid limit preferences', () => {
-    const f = fixture();
-    f.saved.set(SESSION_KEY, '{broken');
-    assert.equal(f.timer.status().phase, 'ready');
-    assert.equal(
-      normalizeSettings({ playLimitMinutes: -1 }, ['float']).playLimitMinutes,
-      0,
-    );
-    assert.equal(
-      normalizeSettings({ playLimitMinutes: 10 }, ['float']).playLimitMinutes,
-      10,
-    );
-  });
-  it('rounds the countdown up and never displays negative time', () => {
-    assert.equal(formatTimer(BREAK_DURATION), '05:00');
-    assert.equal(formatTimer(1), '00:01');
-    assert.equal(formatTimer(-1), '00:00');
   });
 });

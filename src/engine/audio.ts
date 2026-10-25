@@ -45,28 +45,51 @@ export class SoundEngine {
     )
       return;
     const now = ctx.currentTime;
-    if (this.active >= 10 || now - (this.lastSound.get(kind) ?? -1) < 0.035)
+    if (
+      this.active >= 10 ||
+      now - (this.lastSound.get(kind) ?? -1) < (kind === 'choo' ? 1.2 : 0.035)
+    )
       return;
     this.lastSound.set(kind, now);
     this.active++;
     const oscillator = ctx.createOscillator();
     const envelope = ctx.createGain();
     const frequency =
-      { tap: 180, pop: 620, clink: 1350, thud: 100 }[kind] *
+      { tap: 180, pop: 620, clink: 1350, thud: 100, choo: 440 }[kind] *
       (0.9 + Math.random() * 0.2);
-    const duration = kind === 'clink' ? 0.12 : 0.075;
+    const duration = kind === 'choo' ? 0.55 : kind === 'clink' ? 0.12 : 0.075;
     oscillator.type = kind === 'tap' ? 'triangle' : 'sine';
     oscillator.frequency.setValueAtTime(frequency, now);
-    oscillator.frequency.exponentialRampToValueAtTime(
-      kind === 'pop' ? frequency * 0.28 : frequency * 0.65,
-      now + duration,
-    );
-    envelope.gain.setValueAtTime(0.001, now);
-    envelope.gain.linearRampToValueAtTime(
-      Math.min(1, Math.max(0.1, strength)) * (kind === 'clink' ? 0.32 : 0.7),
-      now + 0.003,
-    );
-    envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    if (kind === 'choo') {
+      // Two soft whistle bursts, separated by a short breath.
+      oscillator.frequency.linearRampToValueAtTime(
+        frequency * 1.08,
+        now + 0.08,
+      );
+      oscillator.frequency.setValueAtTime(frequency, now + 0.25);
+      oscillator.frequency.linearRampToValueAtTime(
+        frequency * 0.92,
+        now + duration,
+      );
+      const peak = Math.min(1, Math.max(0.1, strength)) * 0.5;
+      envelope.gain.setValueAtTime(0.001, now);
+      envelope.gain.linearRampToValueAtTime(peak, now + 0.035);
+      envelope.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
+      envelope.gain.setValueAtTime(0.001, now + 0.25);
+      envelope.gain.linearRampToValueAtTime(peak, now + 0.285);
+      envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    } else {
+      oscillator.frequency.exponentialRampToValueAtTime(
+        kind === 'pop' ? frequency * 0.28 : frequency * 0.65,
+        now + duration,
+      );
+      envelope.gain.setValueAtTime(0.001, now);
+      envelope.gain.linearRampToValueAtTime(
+        Math.min(1, Math.max(0.1, strength)) * (kind === 'clink' ? 0.32 : 0.7),
+        now + 0.003,
+      );
+      envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    }
     oscillator.connect(envelope).connect(this.master!);
     oscillator.onended = () => {
       oscillator.disconnect();
